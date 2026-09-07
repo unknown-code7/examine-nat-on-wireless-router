@@ -69,6 +69,14 @@ flowchart LR
     end
 ````
 
+## 🚀 Como Executar o Laboratório
+
+Para praticar, você precisa ter o **Cisco Packet Tracer** instalado. Clique no botão abaixo para baixar o arquivo do projeto:
+
+[![Baixar Laboratório](https://img.shields.io/badge/Download-Clique%20Aqui-green?style=for-the-badge&logo=cisco)](https://raw.githubusercontent.com/unknown-code7/configure-wireless-router-and-client/main/Configure%20a%20Wireless%20Router%20and%20Client.pka)
+
+[![Assistir Tutorial](https://img.shields.io/badge/Assistir_Tutorial-Clique_Aqui-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/share/v/18rSKRXpVg/)
+
 ---
 
 # 🧪 Part 1: Examine the configuration for accessing external network
