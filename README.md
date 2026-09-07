@@ -1,5 +1,4 @@
-
-# 🏠 Configure a Wireless Router and Client
+# 🛡️ Packet Tracer - Examine NAT on a Wireless Router
 
 > **Cisco Packet Tracer Lab**
 >
@@ -11,602 +10,327 @@
 
 # 📖 Descrição
 
-Este laboratório simula a implementação e análise de uma **rede doméstica (Home Network)** utilizando o **Cisco Packet Tracer**, permitindo compreender como diferentes dispositivos compartilham a mesma infraestrutura de rede por meio de um **Wireless Router**.
+Este laboratório apresenta uma atividade prática no **Cisco Packet Tracer** destinada à compreensão do funcionamento do **Network Address Translation (NAT)** em um **Wireless Router**.
 
-A residência recebe o sinal do provedor de Internet através de um **Cable Splitter**, responsável por dividir o sinal coaxial em duas saídas: uma destinada ao **Cable Modem**, que fornece acesso à Internet ao roteador, e outra destinada à **Smart TV**, permitindo a recepção do sinal de televisão via cabo coaxial.
+O cenário permite observar como dispositivos de uma rede interna utilizam **endereços IPv4 privados** para se comunicar com uma rede externa, enquanto o Wireless Router realiza a tradução desses endereços para permitir o acesso a recursos localizados na Internet.
 
-Após receber a conexão do Cable Modem, o **Wireless Router** distribui a conectividade para os dispositivos da rede local e executa funções importantes como **DHCP, NAT e WLAN**.
+Durante o laboratório, serão configurados quatro computadores para obter endereços IP automaticamente através do **DHCP** disponibilizado pelo Wireless Router. Em seguida, será analisado o tráfego gerado pelos dispositivos e o processo de tradução realizado pelo NAT.
 
-Além da rede doméstica, o cenário também inclui um **Servidor Web Externo**, utilizado para validar a comunicação entre a rede local e um serviço Web localizado na Internet.
-
-Durante este laboratório serão abordados conceitos fundamentais de Redes de Computadores, incluindo:
-
-- Configuração de redes sem fio;
-- DHCP;
-- Endereçamento IPv4;
-- Redes privadas e públicas;
-- Gateway padrão;
-- NAT (Network Address Translation);
-- Comunicação entre redes internas e externas;
-- HTTP;
-- Análise de tráfego no Cisco Packet Tracer;
-- Simulação de pacotes;
-- Análise dos cabeçalhos dos pacotes;
-- Testes de conectividade.
+A atividade também utiliza o **Simulation Mode** do Cisco Packet Tracer para permitir a análise detalhada dos pacotes, incluindo os endereços IP de origem e destino antes e depois da passagem pelo roteador.
 
 ---
 
-# 🎯 Objetivos
+# 🎯 Objectives
 
 Ao concluir este laboratório, o estudante será capaz de:
 
-- Configurar um Wireless Router;
-- Configurar uma rede Wireless (Wi-Fi);
-- Compreender o funcionamento do DHCP;
-- Configurar clientes da rede;
-- Identificar endereços IPv4 privados e públicos;
-- Examinar a configuração NAT de um Wireless Router;
-- Configurar 4 PCs para obter endereços IP via DHCP;
-- Validar a comunicação entre dispositivos;
-- Observar o tráfego que atravessa o roteador utilizando NAT;
-- Analisar os cabeçalhos dos pacotes;
-- Identificar a alteração do endereço IP de origem durante a tradução NAT;
-- Testar o acesso a um servidor Web externo;
-- Entender a arquitetura de uma rede doméstica.
+- Examinar a configuração de NAT em um Wireless Router;
+- Configurar quatro PCs para obter endereços IP através de DHCP;
+- Compreender a utilização de endereços IPv4 privados em uma rede interna;
+- Examinar o tráfego que atravessa a rede;
+- Observar o processo de tradução de endereços realizado pelo NAT;
+- Analisar os cabeçalhos dos pacotes antes e depois da tradução.
 
 ---
 
-# 🏡 Arquitetura da Rede
+# 🏗️ Topologia do Laboratório
 
 ```mermaid
-flowchart TB
+flowchart LR
+    PC0["PC0"]
+    PC1["PC1"]
+    PC2["PC2"]
+    PC3["PC3"]
 
-    ISP["🌐 Internet / ISP"]
+    WR["Wireless Router<br/>DHCP • NAT"]
 
-    WEB["🖥️ Servidor Web Externo<br/>ciscolearn.nat.com"]
+    ISP["Internet / ISP"]
+    SERVER["Web Server<br/>ciscolearn.nat.com"]
 
-    SPLITTER["📡 Cable Splitter"]
+    PC0 -->|Ethernet| WR
+    PC1 -->|Ethernet| WR
+    PC2 -->|Ethernet| WR
+    PC3 -->|Ethernet| WR
 
-    MODEM["📶 Cable Modem"]
+    WR -->|NAT / Internet| ISP
+    ISP --> SERVER
 
-    TV["📺 Smart TV"]
+    subgraph LAN["Rede Interna • Endereços Privados"]
+        PC0
+        PC1
+        PC2
+        PC3
+        WR
+    end
 
-    ROUTER["📡 Wireless Router<br/><br/>DHCP • NAT • WLAN<br/>Gateway da Rede"]
-
-    PC1["🖥️ PC 1"]
-    PC2["🖥️ PC 2"]
-    PC3["🖥️ PC 3"]
-    PC4["🖥️ PC 4"]
-
-    ISP --> WEB
-    ISP --> SPLITTER
-
-    SPLITTER --> MODEM
-    SPLITTER --> TV
-
-    MODEM --> ROUTER
-
-    ROUTER --> PC1
-    ROUTER --> PC2
-    ROUTER --> PC3
-    ROUTER --> PC4
-
-    PC1 -. "LAN / IP Privado" .-> ROUTER
-    PC2 -. "LAN / IP Privado" .-> ROUTER
-    PC3 -. "LAN / IP Privado" .-> ROUTER
-    PC4 -. "LAN / IP Privado" .-> ROUTER
-
-    ROUTER == "NAT" ==> WEB
+    subgraph WAN["Rede Externa"]
+        ISP
+        SERVER
+    end
 ````
 
 ---
 
-# 🏠 Estrutura do Laboratório
+# 🧪 Part 1: Examine the configuration for accessing external network
 
-## 🛋️ Sala (Living Room)
+### a. Conectar o primeiro PC
 
-**Equipamentos:**
+Adicione **1 PC** e conecte-o ao **Wireless Router** utilizando um **cabo Copper Straight-Through**.
 
-* Smart TV
-* Laptop
+Aguarde até que todos os indicadores das interfaces fiquem verdes antes de continuar ou utilize a opção **Fast Forward**.
 
----
-
-## 🛏️ Quarto (Bedroom)
-
-**Equipamentos:**
-
-* Desktop PC
-
----
-
-## 🖥️ Escritório (Home Office)
-
-### Infraestrutura de Rede
-
-* Cable Splitter
-* Cable Modem
-* Wireless Router
-
-### Dispositivos
-
-* Desktop PC
-* Laptop
-* PCs utilizados para análise do NAT
-
----
-
-## 🌐 Infraestrutura Externa
-
-### Internet
-
-* Servidor Web Externo
-
-  * Website: **skillsforall.srv**
-  * Servidor utilizado para testar a comunicação entre a rede interna e a rede externa.
-
----
-
-# 📦 Inventário de Equipamentos
-
-| Equipamento          | Quantidade | Função                                                      |
-| -------------------- | ---------: | ----------------------------------------------------------- |
-| Cable Splitter       |          1 | Divide o sinal coaxial entre o Cable Modem e a Smart TV     |
-| Cable Modem          |          1 | Converte o sinal coaxial em Ethernet para acesso à Internet |
-| Wireless Router      |          1 | Gateway da rede, NAT, DHCP e Access Point                   |
-| Desktop PC           |          2 | Clientes da rede                                            |
-| Laptop               |          2 | Clientes da rede                                            |
-| PCs adicionais       |          4 | Clientes utilizados na análise do NAT                       |
-| Smart TV             |          1 | Recebe sinal coaxial e integra-se ao cenário da rede        |
-| Servidor Web Externo |          1 | Hospeda o serviço Web utilizado nos testes                  |
-
----
-
-# 🌐 Tecnologias Utilizadas
-
-* Cisco Packet Tracer
-* IPv4
-* Ethernet
-* Cabo Coaxial
-* IEEE 802.11 (Wi-Fi)
-* DHCP
-* NAT
-* HTTP
-* DNS
-* Wireless LAN (WLAN)
-* Simulation Mode
-* Complex PDU
-* TCP
-
----
-
-# ⚙️ Configurações Realizadas
-
-Durante este laboratório serão realizadas as seguintes atividades:
-
-* Configuração do Wireless Router;
-* Configuração do SSID (Nome da Rede);
-* Configuração da senha da rede Wi-Fi;
-* Configuração do serviço DHCP;
-* Associação dos dispositivos à rede;
-* Obtenção automática de endereços IP;
-* Identificação do Gateway padrão;
-* Análise do endereço IP da interface Internet;
-* Análise do endereço IP da rede local;
-* Análise da faixa de endereços fornecida pelo DHCP;
-* Identificação de endereços privados e públicos;
-* Configuração de 4 PCs;
-* Verificação das configurações IPv4 utilizando `ipconfig /all`;
-* Criação de tráfego HTTP;
-* Observação da tradução NAT;
-* Análise dos cabeçalhos dos pacotes;
-* Testes de comunicação com servidor Web externo.
-
----
-
-# 🔄 Fluxo da Comunicação e NAT
-
-```mermaid
-flowchart LR
-
-    PC["🖥️ PC<br/>IP Privado"]
-
-    LAN["🏠 Rede Local<br/>Endereço Privado"]
-
-    NAT["📡 Wireless Router<br/>NAT"]
-
-    WAN["🌐 Interface Internet<br/>Endereço Público"]
-
-    SERVER["🖥️ Web Server<br/>ciscolearn.nat.com"]
-
-    PC -->|"HTTP Request<br/>SRC: IP Privado"| LAN
-
-    LAN --> NAT
-
-    NAT -->|"NAT Translation<br/>SRC: IP Público"| WAN
-
-    WAN --> SERVER
-
-    SERVER -->|"HTTP Response"| WAN
-
-    WAN --> NAT
-
-    NAT -->|"Reverse NAT"| LAN
-
-    LAN --> PC
-```
-
----
-
-# 🧪 Packet Tracer - Examine NAT on a Wireless Router
-
-## 🎯 Objectives
-
-* Examine NAT configuration on a wireless router;
-* Set up 4 PCs to connect to a wireless router using DHCP;
-* Examine traffic that crosses the network using NAT.
-
----
-
-# 🧪 Part 1: Examine the Configuration for Accessing the External Network
-
-### a. Adicionar o primeiro PC
-
-Adicione 1 PC e conecte-o ao **Wireless Router** utilizando um **cabo straight-through**.
-
-Aguarde até que todos os indicadores de link fiquem verdes antes de prosseguir.
-
-Também é possível utilizar a opção **Fast Forward** para acelerar a convergência da rede.
-
----
-
-### b. Configurar o PC para utilizar DHCP
+### b. Configurar o PC via DHCP
 
 No PC:
 
 **Desktop → IP Configuration → DHCP**
 
-A opção DHCP permite que o dispositivo receba automaticamente um endereço IP fornecido pelo servidor DHCP existente no Wireless Router.
-
----
+A opção **DHCP** permitirá que o dispositivo receba automaticamente um endereço IP disponibilizado pelo servidor DHCP do Wireless Router.
 
 ### c. Identificar o Default Gateway
 
-Na configuração IPv4 do PC, observe o endereço definido como:
+Observe o endereço IP apresentado no campo **Default Gateway**.
 
-**Default Gateway**
+Esse endereço corresponde ao gateway utilizado pelo PC para alcançar redes externas.
 
-Anote esse endereço.
+Feche a janela **IP Configuration** após verificar as informações.
 
-O Gateway padrão representa o endereço utilizado pelo PC para encaminhar tráfego destinado a redes externas.
+### d. Acessar a interface do Wireless Router
 
----
-
-### d. Acessar a interface Web do Wireless Router
-
-Abra o navegador Web do PC e introduza o endereço IP do **Default Gateway** no campo de URL.
+Abra o **Web Browser** do PC e introduza o endereço IP do **Default Gateway** no campo de URL.
 
 Quando solicitado, utilize:
 
 * **Username:** `admin`
 * **Password:** `admin`
 
----
-
 ### e. Acessar o Status do roteador
 
-Na interface Web do Wireless Router:
+Na interface Web do Wireless Router, selecione a opção **Status**, localizada no canto superior direito.
 
-**Status → Router**
-
-Essa seção apresenta informações relacionadas à configuração do roteador.
-
----
+Essa opção apresenta as informações de estado e configuração do roteador.
 
 ### f. Examinar a conexão com a Internet
 
-Localize a seção:
+Na página do roteador, localize a seção referente à **Internet Connection**.
 
-**Internet Connection**
-
-O endereço IP apresentado nessa área corresponde ao endereço atribuído à interface de Internet do Wireless Router pelo ISP.
+O endereço IP apresentado nessa seção corresponde ao endereço atribuído pelo **ISP** à interface de Internet do Wireless Router.
 
 Caso apareça:
 
-`0.0.0.0`
+```text
+0.0.0.0
+```
 
-aguarde alguns segundos e atualize a página.
+aguarde alguns segundos e atualize ou reabra a página. O Wireless Router pode ainda estar obtendo um endereço IP através do servidor DHCP do ISP.
 
-O roteador pode ainda estar aguardando a atribuição de um endereço IP através do DHCP do ISP.
+### ❓ Question
 
-### ❓ Pergunta
-
-**O endereço IP apresentado na interface Internet é privado ou público?**
+**O endereço IP atribuído à interface de Internet é um endereço privado ou público?**
 
 ---
 
-# 🧪 Part 2: Examine as Configurações para Acessar a Rede Interna
+# 🌐 Part 2: Examine the configurations for accessing the internal network
 
 ### a. Acessar Local Network
 
-Na barra de opções do menu **Status**, selecione:
+Na barra do submenu **Status**, selecione:
 
 **Local Network**
 
----
+### b. Examinar a rede interna
 
-### b. Examinar as informações da rede local
+Role a página para baixo e examine as informações referentes à **Local Network**.
 
-Observe as informações apresentadas na seção **Local Network**.
-
-Esse endereço representa a rede interna utilizada pelos dispositivos conectados ao Wireless Router.
-
----
+O endereço apresentado corresponde ao endereço utilizado pela rede interna do Wireless Router.
 
 ### c. Examinar o servidor DHCP
 
-Desça na página e localize as informações referentes ao:
-
-**DHCP Server**
+Continue descendo a página para visualizar as informações do **DHCP Server**.
 
 Observe:
 
-* Endereço da rede;
-* Endereço inicial;
-* Endereço final;
-* Faixa de endereços que podem ser atribuídos aos hosts.
+* Endereço da rede interna;
+* Endereço do gateway;
+* Servidor DHCP;
+* Faixa de endereços IP disponibilizados aos hosts conectados.
 
-### ❓ Pergunta
+### ❓ Question
 
 **Os endereços utilizados na rede interna são privados ou públicos?**
 
----
-
-### d. Fechar a configuração
+### d. Encerrar a configuração
 
 Após concluir a análise, feche a janela de configuração do Wireless Router.
 
 ---
 
-# 🧪 Part 3: Connect 3 PCs to the Wireless Router
+# 💻 Part 3: Connect 3 PCs to the wireless router
 
-### a. Adicionar os PCs
+### a. Adicionar os computadores
 
-Adicione **3 PCs adicionais** e conecte-os ao Wireless Router utilizando **cabos straight-through**.
+Adicione **3 PCs adicionais** ao cenário.
 
-Aguarde até que os indicadores de link fiquem verdes ou utilize **Fast Forward**.
+Conecte cada PC ao Wireless Router utilizando **cabos Copper Straight-Through**.
 
----
+Aguarde até que todos os indicadores das interfaces fiquem verdes ou utilize **Fast Forward**.
 
-### b. Configurar DHCP nos PCs
+### b. Configurar os PCs via DHCP
 
 Em cada PC:
 
 **Desktop → IP Configuration → DHCP**
 
-Cada dispositivo deverá receber automaticamente um endereço IP através do servidor DHCP do Wireless Router.
+Cada dispositivo deverá receber automaticamente um endereço IP através do servidor DHCP configurado no Wireless Router.
 
-Após receber o endereço, feche a janela **IP Configuration**.
+Feche a janela **IP Configuration** após a configuração.
 
----
+### c. Verificar a configuração IP
 
-### c. Verificar a configuração IPv4
-
-Em cada PC:
+Em cada PC, abra:
 
 **Desktop → Command Prompt**
 
 Execute:
 
-```bash
+```text
 ipconfig /all
 ```
 
-Verifique:
+Utilize o comando para verificar:
 
-* IPv4 Address;
-* Subnet Mask;
+* Endereço IPv4;
+* Máscara de sub-rede;
 * Default Gateway;
-* DHCP Server;
-* DNS Server.
+* Informações relacionadas ao DHCP.
 
-### ⚠️ Nota
-
-Os dispositivos da rede interna receberão **endereços IP privados**.
-
-Endereços privados não podem atravessar diretamente a Internet.
-
-Por isso, quando um dispositivo interno precisa acessar uma rede externa, é necessário que ocorra uma **tradução NAT** no Wireless Router.
+> **Nota:** Os computadores receberão endereços IPv4 privados. Esses endereços não podem ser utilizados diretamente para atravessar a Internet. Por isso, o Wireless Router precisa realizar uma **tradução NAT** antes que o tráfego alcance a rede externa.
 
 ---
 
-# 🧪 Part 4: View NAT Translation Across the Wireless Router
+# 🔄 Part 4: View NAT translation across the wireless router
 
-## a. Entrar no Simulation Mode
+Nesta etapa será utilizado o **Simulation Mode** do Cisco Packet Tracer para observar o tráfego atravessando o Wireless Router.
+
+### a. Entrar no Simulation Mode
 
 Clique na aba:
 
 **Simulation**
 
-A aba está localizada na parte inferior direita da janela do Cisco Packet Tracer, próxima da opção **Realtime**.
+A aba está localizada no canto inferior direito da interface do Cisco Packet Tracer, ao lado de **Realtime**, e possui o símbolo de um cronômetro.
 
-O Simulation Mode permite observar o processamento dos pacotes passo a passo.
-
----
-
-## b. Criar tráfego utilizando um Complex PDU
-
-### 1. Configurar os filtros de eventos
+### b. Criar um Complex PDU
 
 No **Simulation Panel**:
 
-1. Clique em **Show All/None** para desmarcar os eventos;
+1. Clique em **Show All/None** para remover os eventos atualmente selecionados;
 2. Clique em **Edit Filters**;
-3. Acesse a aba **Misc**;
-4. Marque:
+3. Na aba **Misc**, marque:
 
    * **TCP**
    * **HTTP**
-5. Feche a janela.
+4. Feche a janela de filtros;
+5. Clique no ícone de **Complex PDU** representado pelo envelope aberto;
+6. Selecione um dos PCs como dispositivo de origem.
 
----
-
-### 2. Criar um Complex PDU
-
-Clique no ícone de envelope aberto localizado no menu superior.
-
----
-
-### 3. Definir o dispositivo de origem
-
-Clique em um dos PCs para especificá-lo como:
-
-**Source Device**
-
----
-
-## c. Configurar o Complex PDU
+### c. Configurar o Complex PDU
 
 Na janela **Create Complex PDU**, configure:
 
-### PDU Settings
+**PDU Settings**
 
-**Application:**
+* **Application:** `HTTP`
 
-```text
-HTTP
-```
+**Destination**
 
-### Destination
+* Selecione o servidor **ciscolearn.nat.com**.
 
-Selecione o servidor:
-
-```text
-ciscolearn.nat.com
-```
-
-### Source Port
-
-Configure:
+**Source Port**
 
 ```text
 1000
 ```
 
-### Simulation Settings
+**Simulation Settings**
 
-Selecione:
+* **Periodic:** selecionado;
+* **Interval:** `120` segundos.
 
-```text
-Periodic
-```
-
-Defina o intervalo:
-
-```text
-120 seconds
-```
-
-Por fim, clique em:
+Após configurar os parâmetros, clique em:
 
 **Create PDU**
 
----
-
-## d. Liberar o Simulation Panel
+### d. Expandir o Simulation Panel
 
 Clique duas vezes no **Simulation Panel** para desbloqueá-lo da janela principal do Packet Tracer.
 
-Isso permite mover o painel e visualizar simultaneamente toda a topologia da rede.
+Isso permitirá movimentar o painel e visualizar toda a topologia da rede.
 
----
-
-## e. Observar o fluxo do tráfego
+### e. Observar o tráfego
 
 Clique em:
 
 **Play**
 
-no Simulation Panel.
+no Simulation Panel para iniciar a simulação.
 
-Para acelerar a animação, mova o controle de velocidade para a direita.
+O controle de velocidade pode ser deslocado para a direita para acelerar a animação.
 
-### ⚠️ Nota
-
-Quando aparecer a mensagem:
-
-**Buffer Full**
-
-clique em:
-
-**View Previous Events**
-
-para continuar analisando os eventos anteriores.
+> **Nota:** Caso apareça a mensagem **Buffer Full**, utilize a opção **View Previous Events** para continuar examinando os eventos anteriores.
 
 ---
 
-# 🧪 Part 5: View the Header Information of the Packets
+# 📦 Part 5: View the header information of the packets
 
-## a. Examinar os cabeçalhos dos pacotes
+Nesta etapa será realizada uma análise dos cabeçalhos dos pacotes que percorrem a rede entre um PC e o servidor Web.
 
-Observe os pacotes enviados entre o PC e o servidor Web.
+### a. Examinar os pacotes
 
 No **Simulation Panel**:
 
 1. Localize a lista de eventos;
-2. Clique duas vezes na **3ª linha** da lista;
+2. Dê duplo clique na **3ª linha** da lista de eventos;
 3. Um envelope representando o evento será apresentado na área de trabalho;
 4. Clique no envelope para visualizar as informações do pacote.
 
----
+### b. Examinar o Inbound PDU
 
-## b. Examinar o Inbound PDU
-
-Selecione:
+Selecione a aba:
 
 **Inbound PDU Details**
 
-Examine as informações do pacote.
-
-Observe principalmente:
+Examine as informações do pacote, principalmente:
 
 * **SRC IP Address**
 * **Destination IP Address**
 
----
+Registre o endereço IP de origem apresentado.
 
-## c. Examinar o Outbound PDU
+### c. Examinar o Outbound PDU
 
-Selecione:
+Agora selecione:
 
 **Outbound PDU Details**
 
-Observe novamente:
+Compare novamente:
 
 * **SRC IP Address**
 * **Destination IP Address**
 
-### 🔎 Observação importante
+Observe especialmente a alteração no **SRC IP Address**.
 
-Será possível observar uma alteração no:
+Essa alteração demonstra o processo de **NAT**, no qual o endereço IP privado utilizado pelo dispositivo interno é traduzido pelo Wireless Router antes que o pacote seja encaminhado para a rede externa.
 
-**SRC IP Address**
+### d. Examinar outros eventos
 
-Essa alteração representa o processo de **Network Address Translation (NAT)** realizado pelo Wireless Router.
+Clique em diferentes linhas da lista de eventos para acompanhar os cabeçalhos dos pacotes durante as diferentes etapas da comunicação.
 
----
+Observe como as informações dos pacotes podem mudar conforme eles atravessam os dispositivos da topologia.
 
-## d. Examinar outros eventos
+### e. Verificar o resultado
 
-Clique em diferentes linhas da lista de eventos para acompanhar os cabeçalhos dos pacotes durante todo o processo de comunicação.
-
-Observe como as informações do pacote podem mudar à medida que ele atravessa o Wireless Router.
-
----
-
-## e. Verificar os resultados
-
-Quando terminar a atividade, clique em:
+Após concluir a atividade, clique em:
 
 **Check Results**
 
@@ -614,202 +338,94 @@ para verificar o resultado do laboratório.
 
 ---
 
-# 🔄 Fluxo do Laboratório
+# 🧠 Conceitos Abordados
 
-```mermaid
-flowchart TD
+* Network Address Translation (NAT)
+* IPv4
+* Endereços IP privados
+* Endereços IP públicos
+* DHCP
+* Default Gateway
+* Wireless Router
+* LAN
+* WAN
+* TCP
+* HTTP
+* Complex PDU
+* Simulation Mode
+* Packet Headers
+* Source IP
+* Destination IP
+* Cisco Packet Tracer
 
-    A["🌐 Provedor de Internet"] --> B["📡 Cable Splitter"]
+---
 
-    B --> C["📶 Cable Modem"]
-    B --> D["📺 Smart TV"]
+# 🔍 O que observar durante o laboratório
 
-    C --> E["📡 Wireless Router"]
+O principal objetivo desta atividade é compreender a diferença entre o endereço utilizado pelo dispositivo dentro da **LAN** e o endereço utilizado pelo Wireless Router ao acessar a **rede externa**.
 
-    E --> F["🖥️ PC 1"]
-    E --> G["🖥️ PC 2"]
-    E --> H["🖥️ PC 3"]
-    E --> I["🖥️ PC 4"]
+O fluxo básico pode ser representado da seguinte forma:
 
-    F --> J["🏠 Rede Local<br/>Endereços Privados"]
-    G --> J
-    H --> J
-    I --> J
-
-    J --> E
-
-    E --> K["🔄 NAT"]
-
-    K --> L["🌐 Rede Externa"]
-
-    L --> M["🖥️ Servidor Web<br/>ciscolearn.nat.com"]
-
-    M --> N["📊 Análise dos Pacotes"]
-
-    N --> O["🔎 Inbound PDU"]
-    N --> P["🔎 Outbound PDU"]
-
-    O --> Q["SRC / DST IP"]
-    P --> Q
-
-    Q --> R["✅ Verificação da Tradução NAT"]
+```text
+PC
+│
+│ IP Privado
+▼
+Wireless Router
+│
+│ NAT
+│
+│ IP Público
+▼
+Internet
+│
+▼
+ciscolearn.nat.com
 ```
 
----
+Antes do NAT, o pacote utiliza o endereço IP privado do PC como origem.
 
-# 🧪 Testes Realizados
-
-Após a configuração, recomenda-se validar:
-
-* ✅ Comunicação entre os Desktop PCs;
-* ✅ Comunicação entre os Laptops;
-* ✅ Conectividade da Smart TV;
-* ✅ Recebimento automático de endereços IP via DHCP;
-* ✅ Comunicação com o Gateway;
-* ✅ Identificação do endereço IP da interface Internet;
-* ✅ Identificação da rede interna;
-* ✅ Identificação da faixa DHCP;
-* ✅ Identificação de endereços privados;
-* ✅ Identificação de endereços públicos;
-* ✅ Acesso ao servidor Web externo;
-* ✅ Geração de tráfego HTTP;
-* ✅ Visualização do tráfego no Simulation Mode;
-* ✅ Análise dos cabeçalhos dos pacotes;
-* ✅ Observação da alteração do endereço IP de origem;
-* ✅ Validação da tradução NAT;
-* ✅ Comunicação entre os dispositivos da LAN e a rede externa.
-
----
-
-# 📚 Conceitos Abordados
-
-* Redes Domésticas
-* Topologias de Rede
-* Cabo Coaxial
-* Ethernet
-* Wireless LAN (WLAN)
-* DHCP
-* Gateway Padrão
-* NAT
-* Network Address Translation
-* Endereços IPv4 Privados
-* Endereços IPv4 Públicos
-* DNS
-* HTTP
-* TCP
-* Wireless Router
-* Internet
-* ISP
-* Simulation Mode
-* Complex PDU
-* PDU Details
-* Cabeçalhos de Pacotes
-* Cisco Packet Tracer
-* Cisco Networking Academy
-
----
-
-# 📌 Pré-requisitos
-
-* Cisco Packet Tracer instalado;
-* Conhecimentos básicos de Redes de Computadores;
-* Conceitos básicos de IPv4;
-* Noções de redes Wireless;
-* Conhecimentos básicos de DHCP;
-* Conhecimentos introdutórios sobre NAT.
+Após atravessar o Wireless Router, o endereço de origem é traduzido para o endereço utilizado na interface externa do roteador.
 
 ---
 
 # 🎓 Competências Desenvolvidas
 
-Ao concluir este laboratório, o estudante desenvolverá competências em:
+Ao concluir este laboratório, o estudante será capaz de:
 
-* Configuração de Roteadores Wireless;
-* Administração de Redes Domésticas;
-* Configuração de Clientes de Rede;
-* Configuração automática de endereços IPv4;
-* Análise de DHCP;
-* Identificação de endereços privados e públicos;
-* Compreensão do funcionamento do NAT;
-* Análise de tráfego de rede;
-* Utilização do Simulation Mode;
-* Criação de Complex PDU;
-* Análise de cabeçalhos de pacotes;
-* Testes de conectividade;
-* Diagnóstico de Problemas de Conectividade;
-* Simulação de Redes Cisco.
+* Identificar endereços IPv4 privados e públicos;
+* Compreender a função do DHCP em uma rede doméstica;
+* Identificar o Default Gateway de um host;
+* Compreender o funcionamento básico do NAT;
+* Analisar alterações nos cabeçalhos dos pacotes;
+* Utilizar o Simulation Mode do Cisco Packet Tracer;
+* Analisar tráfego TCP/HTTP;
+* Interpretar o processo de comunicação entre uma LAN e uma rede externa.
 
 ---
 
-# 🔍 Conceito Fundamental: NAT
+# 📌 Resultado Esperado
 
-O **Network Address Translation (NAT)** permite que dispositivos que utilizam endereços IPv4 privados comuniquem-se com redes externas através da tradução desses endereços.
+Ao final do laboratório, os quatro PCs deverão estar conectados ao Wireless Router e obter automaticamente seus endereços IPv4 através do **DHCP**.
 
-No cenário deste laboratório:
+Os computadores deverão utilizar endereços privados na rede interna, enquanto o Wireless Router realizará a tradução **NAT** para permitir a comunicação com o servidor Web externo.
 
-```mermaid
-flowchart LR
-
-    PC["🖥️ PC<br/>IP Privado"]
-
-    ROUTER["📡 Wireless Router<br/>NAT"]
-
-    INTERNET["🌐 Internet"]
-
-    SERVER["🖥️ Servidor Web"]
-
-    PC -->|"SRC: IP Privado<br/>DST: Servidor"| ROUTER
-
-    ROUTER -->|"SRC: IP Traduzido<br/>DST: Servidor"| INTERNET
-
-    INTERNET --> SERVER
-
-    SERVER -->|"Resposta"| INTERNET
-
-    INTERNET --> ROUTER
-
-    ROUTER -->|"Tradução reversa"| PC
-```
-
-O processo pode ser representado conceitualmente como:
-
-```text
-Host interno
-     │
-     │ IP privado
-     ▼
-Wireless Router
-     │
-     │ NAT
-     ▼
-Endereço traduzido
-     │
-     ▼
-Internet
-     │
-     ▼
-Servidor Web
-```
+A análise realizada no **Simulation Mode** deverá permitir identificar a alteração do endereço IP de origem dos pacotes durante a passagem pelo Wireless Router.
 
 ---
 
-# ✅ Resultado Esperado
+# 🛠️ Tecnologias e Ferramentas
 
-Ao final do laboratório:
-
-* O **Cable Splitter** deverá distribuir corretamente o sinal coaxial;
-* O **Cable Modem** deverá fornecer conectividade ao Wireless Router;
-* O Wireless Router deverá possuir uma interface voltada para a rede externa;
-* A rede interna deverá utilizar endereços IPv4 privados;
-* Os PCs deverão obter automaticamente seus endereços através do DHCP;
-* Os dispositivos deverão utilizar o Wireless Router como Gateway padrão;
-* O tráfego destinado à rede externa deverá atravessar o Wireless Router;
-* O Wireless Router deverá realizar a tradução NAT;
-* O endereço IP de origem deverá apresentar alteração durante o processo de tradução;
-* O tráfego HTTP deverá ser observado no **Simulation Mode**;
-* Os cabeçalhos **Inbound PDU** e **Outbound PDU** deverão permitir observar o processo;
-* Os PCs deverão conseguir comunicar-se com o servidor Web externo;
-* A atividade deverá ser concluída com sucesso através da opção **Check Results**.
+* Cisco Packet Tracer
+* IPv4
+* DHCP
+* NAT
+* TCP
+* HTTP
+* Ethernet
+* Wireless Router
+* Simulation Mode
+* Complex PDU
 
 ---
 
