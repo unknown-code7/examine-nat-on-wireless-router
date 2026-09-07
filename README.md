@@ -1,5 +1,4 @@
 
-````markdown
 # 🏠 Configure a Wireless Router and Client
 
 > **Cisco Packet Tracer Lab**
