@@ -75,7 +75,7 @@ Para praticar, você precisa ter o **Cisco Packet Tracer** instalado. Clique no 
 
 [![Baixar Laboratório](https://img.shields.io/badge/Download-Clique%20Aqui-green?style=for-the-badge&logo=cisco)](https://github.com/unknown-code7/examine-nat-on-wireless-router/raw/refs/heads/main/Examine%20NAT%20on%20a%20Wireless%20Router%20Instructions.pka)
 
-[![Assistir Tutorial](https://img.shields.io/badge/Assistir_Tutorial-Clique_Aqui-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/share/v/18rSKRXpVg/)
+[![Assistir Tutorial](https://img.shields.io/badge/Assistir_Tutorial-Clique_Aqui-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/share/v/1HrREZbA4B/)
 
 ---
 
